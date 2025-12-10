@@ -7,8 +7,6 @@ ENVS = ("dev", "prd")
 
 VOLUMES = (
     "raw_files",
-    "checkpoint_files",
-    "schema_files"
 )
 
 CATALOG_PREFIX = "sales"

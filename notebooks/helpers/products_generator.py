@@ -9,7 +9,7 @@ class ProductsGenerator:
         self,
         env: str,
         num_products: int = 50,
-        base_date: datetime.date = datetime.date(2025, 10, 1),
+        base_date: datetime.date = datetime.date(2025, 12, 10),
         categories: List[str] = None,
         price_range: tuple = (5, 500),
     ):
@@ -51,15 +51,13 @@ class ProductsGenerator:
         """
         Generate and upload daily product files with incremental updates and duplicates.
         """
-        day_offset = self.num_days
-        current_date = self.base_date + datetime.timedelta(days=day_offset)
 
         # Prepare daily rows and add duplicates
         daily_rows = list(self.products.values())
         all_rows = self._add_duplicates(daily_rows, num_duplicates)
 
         # Build filename and upload to Databricks volume
-        filename = f"products_{current_date.strftime('%Y%m%d')}.csv"
+        filename = f"products_{datetime.datetime.now().strftime('%Y%m%d')}.csv"
         buffer = workspace_utils.save_data_to_buffer(all_rows, self.field_names)
         workspace_utils.upload_buffer_data_to_databricks(buffer, filename, self.base_path)
 

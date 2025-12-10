@@ -15,18 +15,15 @@ class UsersGenerator:
         num_users: int = 50,
         start_id: int = 1001,
         end_id: int = 1050,
-        base_date: datetime.date = datetime.date(2025, 10, 1),
+        base_date: datetime.date = datetime.date(2025, 12, 10),
     ):
         self.name = "user"
         self.field_names = ["user_id", "name", "email", "phone", "is_active", "last_modified"]
-        self.num_days = 0
-
         self.base_path = f"/Volumes/sales_{env}/{utils.get_base_user_schema()}_bronze/raw_files/users"
         self.num_users = num_users
         self.start_id = start_id
         self.end_id = end_id
         self.base_date = base_date
-
         self.users = self._generate_initial_users()
 
     def _generate_email_from_name(self, name: str) -> str:
@@ -60,11 +57,9 @@ class UsersGenerator:
         """
         Generate daily updates for the user dataset and upload each day to Databricks.
         """
-        day_offset = self.num_days
-        current_date = self.base_date + datetime.timedelta(days=0)
 
         # Build filename and upload to Databricks volume
-        filename = f"users_{current_date.strftime('%Y%m%d')}.csv"
+        filename = f"users_{datetime.datetime.now().strftime('%Y%m%d')}.csv"
         all_rows = list(self.users.values())
         buffer = workspace_utils.save_data_to_buffer(all_rows, self.field_names)
         workspace_utils.upload_buffer_data_to_databricks(buffer, filename, self.base_path)

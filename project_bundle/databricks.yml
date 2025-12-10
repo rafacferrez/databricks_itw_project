@@ -1,14 +1,10 @@
 # This is a Databricks asset bundle definition for capstone_project.
 # See https://docs.databricks.com/dev-tools/bundles/index.html for documentation.
 bundle:
-  name: capstone_project
+  name: databricks_itw_project
 
 include:
-  - resources/personal_cluster.cluster.yml
-  - resources/capstone_batch.job.yml
-  - resources/capstone_dlt_events_silver.pipeline.yml
-  - resources/capstone_gold_mvs.pipeline.yml
-  - resources/capstone_streaming_events.job.yml
+  - resources/orders_pipeline.pipeline.yml
 
 variables:
   env:
@@ -16,7 +12,7 @@ variables:
     default: dev
   target_catalog:
     description: The catalog per environment (dev or prd).
-    default: capstone_dev
+    default: sales_dev
 
 targets:
   dev:
@@ -38,4 +34,4 @@ targets:
     #override variables values for production  
     variables:
       env: prd
-      target_catalog: capstone_prd
+      target_catalog: sales_prd
