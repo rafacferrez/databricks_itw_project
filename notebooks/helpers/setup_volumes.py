@@ -11,19 +11,21 @@ VOLUMES = (
     "schema_files"
 )
 
+CATALOG_PREFIX = "sales"
+
 def create_volumes():
     """Create volumes for each data entities"""
     
     for env in ENVS:
 
-        spark.sql(f"USE CATALOG capstone_{env}")
+        spark.sql(f"USE CATALOG {CATALOG_PREFIX}_{env}")
 
         schema_name = f"{utils.get_base_user_schema()}_bronze"
 
         for volume in VOLUMES:
 
             spark.sql(f"CREATE VOLUME IF NOT EXISTS {schema_name}.{volume}")
-            print(f"🏗️  Created volume: capstone_{env}.{schema_name}.{volume}")
+            print(f"🏗️  Created volume: {CATALOG_PREFIX}_{env}.{schema_name}.{volume}")
 
 
 def clean_up_volumes():
@@ -31,11 +33,11 @@ def clean_up_volumes():
     
     for env in ENVS:
 
-        spark.sql(f"USE CATALOG capstone_{env}")
+        spark.sql(f"USE CATALOG {CATALOG_PREFIX}_{env}")
 
         schema_name = f"{utils.get_base_user_schema()}_bronze"
 
         for volume in VOLUMES:
 
             spark.sql(f"DROP VOLUME IF EXISTS {schema_name}.{volume}")
-            print(f"🏗️  Cleaned up volume: capstone_{env}.{schema_name}.{volume}")
+            print(f"🏗️  Cleaned up volume: {CATALOG_PREFIX}_{env}.{schema_name}.{volume}")

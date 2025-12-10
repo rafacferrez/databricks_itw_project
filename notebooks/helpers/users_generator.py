@@ -2,8 +2,7 @@ import random
 import datetime
 from faker import Faker
 from typing import Dict
-
-from instructors.src.helpers import workspace_utils as utils
+from helpers import utils, workspace_utils
 
 
 fake = Faker()
@@ -12,7 +11,7 @@ fake = Faker()
 class UsersGenerator:
     def __init__(
         self,
-        base_path: str,
+        env: str,
         num_users: int = 50,
         start_id: int = 1001,
         end_id: int = 1050,
@@ -22,7 +21,7 @@ class UsersGenerator:
         self.field_names = ["user_id", "name", "email", "phone", "is_active", "last_modified"]
         self.num_days = 0
 
-        self.base_path = base_path
+        self.base_path = f"/Volumes/sales_{env}/{utils.get_base_user_schema()}_bronze/raw_files/users"
         self.num_users = num_users
         self.start_id = start_id
         self.end_id = end_id
@@ -57,43 +56,17 @@ class UsersGenerator:
             }
         return users
 
-    def _update_users_daily(self, current_date: datetime.date):
-        """
-        Update the user dataset to simulate daily changes.
-        Each user has a chance to change email, phone, is_active status,
-        and last_modified timestamp.
-        """
-        for uid, u in self.users.items():
-            updated = False
-            if random.random() < 0.2:
-                u["email"] = self._generate_email_from_name(u["name"])
-                updated = True
-            if random.random() < 0.2:
-                u["phone"] = fake.phone_number()
-                updated = True
-            if random.random() < 0.1:
-                u["is_active"] = not u["is_active"]
-                updated = True
-            if updated:
-                u["last_modified"] = current_date.isoformat()
-
     def generate_new_file(self) -> None:
         """
         Generate daily updates for the user dataset and upload each day to Databricks.
         """
         day_offset = self.num_days
-        current_date = self.base_date + datetime.timedelta(days=day_offset)
-        
-        # Apply daily updates after the first day
-        if day_offset > 0:
-            self._update_users_daily(current_date)
+        current_date = self.base_date + datetime.timedelta(days=0)
 
         # Build filename and upload to Databricks volume
         filename = f"users_{current_date.strftime('%Y%m%d')}.csv"
         all_rows = list(self.users.values())
-        buffer = utils.save_data_to_buffer(all_rows, self.field_names)
-        utils.upload_buffer_data_to_databricks(buffer, filename, self.base_path)
-        #utils.upload_buffer_data_to_local(buffer, filename, self.base_path)
-        self.num_days += 1
+        buffer = workspace_utils.save_data_to_buffer(all_rows, self.field_names)
+        workspace_utils.upload_buffer_data_to_databricks(buffer, filename, self.base_path)
 
         print(f"OK {filename} — {len(all_rows)} rows")
