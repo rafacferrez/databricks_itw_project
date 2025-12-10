@@ -1,0 +1,15 @@
+resources:
+  pipelines:
+    pipeline_capstone_dlt_events_silver:
+      name: ${var.env}_capstone_dlt_events_silver_${workspace.current_user.short_name}
+      configuration:
+        catalog: ${var.target_catalog}
+        bronze_schema: ${workspace.current_user.short_name}_bronze
+        silver_schema: ${workspace.current_user.short_name}_silver
+      libraries:
+        - notebook:
+            path: /Users/${workspace.current_user.userName}/eb-databricks-for-de-capstone/instructors/notebooks/4-transformations-dlt
+      schema: ${workspace.current_user.short_name}_silver
+      continuous: true
+      catalog: ${var.target_catalog}
+      serverless: true

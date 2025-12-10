@@ -1,0 +1,18 @@
+resources:
+  clusters:
+    personal_cluster:
+      cluster_name: ${var.env}_${workspace.current_user.short_name}_personal_cluster
+      num_workers: 0
+      node_type_id: 'i3.xlarge'
+      driver_node_type_id: 'i3.xlarge'
+      spark_version: '15.4.x-scala2.12'
+      spark_conf:
+        'spark.databricks.cluster.profile': 'singleNode'
+        'spark.master': "local[*, 4]"
+      autotermination_minutes: 30
+      enable_elastic_disk: true
+      single_user_name: ${workspace.current_user.userName}
+      policy_id: '9C6308F703002EBD'
+      enable_local_disk_encryption: false
+      data_security_mode: SINGLE_USER
+      runtime_engine: STANDARD
