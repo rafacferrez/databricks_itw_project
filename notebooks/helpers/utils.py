@@ -47,17 +47,3 @@ def get_param(name, default):
         return dbutils.widgets.get(name)
     except:
         return default
-
-
-def calculate_dataframe_checksum(df) -> str:
-    # Collect the DataFrame rows and convert to a sorted list of strings
-    rows = df.collect()
-    rows_as_strings = [str(row) for row in rows]
-    rows_as_strings.sort()
-
-    # Calculate the checksum
-    checksum = hashlib.sha256()
-    for row in rows_as_strings:
-        checksum.update(row.encode('utf-8'))
-
-    return checksum.hexdigest()
