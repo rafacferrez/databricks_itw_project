@@ -12,17 +12,19 @@ def dim_user():
 
     return spark.sql(f"""
     SELECT
-        to_date(updated_at) AS order_date,
-        sale_id as order_id,
-        product_id,
-        user_id,
-        COUNT(sale_id) AS number_of_orders,
-        SUM(qty) AS total_quantity,
-        ROUND(SUM(qty * price), 2) AS total_orders_amount
-    FROM {catalog}.{silver_schema}.cleaned_order
+        to_date(co.updated_at) AS order_date,
+        co.order_id as order_id,
+        coi.product_id,
+        co.user_id,
+        COUNT(co.order_id) AS number_of_orders,
+        SUM(coi.qty) AS total_quantity,
+        ROUND(SUM(coi.qty * coi.price), 2) AS total_orders_amount
+    FROM {catalog}.{silver_schema}.cleaned_order co
+    INNER JOIN {catalog}.{silver_schema}.cleaned_order_item coi
+    ON co.order_id = coi.order_id
     GROUP BY
-        to_date(updated_at),
-        order_id,
-        product_id,
-        user_id
+        to_date(co.updated_at),
+        co.order_id,
+        coi.product_id,
+        co.user_id
     """)

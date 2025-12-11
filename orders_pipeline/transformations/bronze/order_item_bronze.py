@@ -5,15 +5,15 @@ catalog = spark.conf.get("catalog")
 bronze_schema = spark.conf.get("bronze_schema")
 
 @dp.table(
-    name=f"{catalog}.{bronze_schema}.order"
+    name=f"{catalog}.{bronze_schema}.order_item"
 )
 def orders_bronze():
     schema = """
-        order_id int, user_id int, status string, updated_at timestamp
+        order_id int, product_id int, order_item_id int, qty int, price double, status string, updated_at timestamp
     """
     return (spark.readStream.format("cloudFiles")
         .option("cloudFiles.format", "csv")
         .option("header", True)
         .schema(schema)
-        .load(f"/Volumes/{catalog}/{bronze_schema}/raw_files/orders")
+        .load(f"/Volumes/{catalog}/{bronze_schema}/raw_files/order_items")
     )

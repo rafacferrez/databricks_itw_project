@@ -11,7 +11,8 @@ silver_schema = spark.conf.get("silver_schema")
 def orders_silver():
 
     orders = (spark.readStream.table(f"{catalog}.{bronze_schema}.order")
-        .filter("sale_id is not null")
+        .filter("order_id is not null")
+        .dropDuplicates(["order_id"])
     )
 
     users = (spark.readStream.table(f"{catalog}.{silver_schema}.cleaned_user")
@@ -24,16 +25,6 @@ def orders_silver():
         )
     )
 
-    products = (spark.readStream.table(f"{catalog}.{silver_schema}.cleaned_product")
-        .drop("price", "last_modified")
-        .selectExpr(
-            "product_id",
-            "name as product_name",
-            "category as product_category"
-        )
-    )
-
     return (orders
         .join(users, "user_id")
-        .join(products, "product_id")
     )
